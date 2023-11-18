@@ -1,14 +1,10 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use std::path::PathBuf;
+
+pub enum Url {
+    Pets,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub fn untar_images(url: Url) -> PathBuf {
+    todo!()
 }
+

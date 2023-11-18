@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 fn main() {
-    println!("Hello, world!");
+    let path: PathBuf = tardyai::untar_images(tardyai::Url::Pets).join("images");
 }
