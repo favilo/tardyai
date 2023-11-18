@@ -1,9 +1,10 @@
 [workspace]
+resolver = "2"
 members = [
     "tardyai",
     "chapter1",
 ]
 
-[dependencies]
+[workspace.dependencies]
 dfdx = { version = "0.13", features = ["f16", "cuda"] }
 log = { version = "0.4" }
