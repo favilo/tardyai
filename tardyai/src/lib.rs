@@ -34,7 +34,7 @@ impl Url {
     pub fn url(self) -> String {
         match self {
             Self::Pets => {
-                format!("{}{}{}", S3_BASE, S3_IMAGE, "oxford-iiit-pet.tgz")
+                format!("{S3_BASE}{S3_IMAGE}oxford-iiit-pet.tgz")
             }
         }
     }
