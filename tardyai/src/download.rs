@@ -1,7 +1,7 @@
 use std::{
     fs::File,
     io::{self, Seek},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use flate2::read::GzDecoder;
@@ -48,7 +48,7 @@ pub fn untar_images(url: Url) -> Result<PathBuf, Error> {
     Ok(dir)
 }
 
-fn download_archive(url: Url, dest_dir: &PathBuf) -> Result<PathBuf, Error> {
+fn download_archive(url: Url, dest_dir: &Path) -> Result<PathBuf, Error> {
     let mut response = reqwest::blocking::get(url.url())?;
     let archive_name = response
         .url()
@@ -75,7 +75,7 @@ fn download_archive(url: Url, dest_dir: &PathBuf) -> Result<PathBuf, Error> {
     Ok(archive_file)
 }
 
-fn extract_archive(archive_file: &PathBuf, dest_dir: &PathBuf) -> Result<PathBuf, Error> {
+fn extract_archive(archive_file: &Path, dest_dir: &Path) -> Result<PathBuf, Error> {
     let tar_gz = File::open(archive_file)?;
     let tar = GzDecoder::new(tar_gz);
     let mut archive = Archive::new(tar);
