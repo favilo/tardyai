@@ -10,3 +10,4 @@ color-eyre = "0.6.2"
 tardyai = { path = "../tardyai" }
 env_logger = { workspace = true }
 log = { workspace = true }
+dfdx = { workspace = true }

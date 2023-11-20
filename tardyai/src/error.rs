@@ -1,4 +1,3 @@
-
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("reqwest error: {0}")]
@@ -12,5 +11,7 @@ pub enum Error {
 
     #[error("tar entry error: {0}")]
     TarEntry(&'static str),
-}
 
+    #[error("image error: {0}")]
+    Image(#[from] image::ImageError),
+}

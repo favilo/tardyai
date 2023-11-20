@@ -1,3 +1,4 @@
+pub mod datasets;
 pub mod download;
 pub mod error;
 
