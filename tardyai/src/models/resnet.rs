@@ -162,7 +162,7 @@ where
             AutoDevice,
         >>::iter_tensors(&mut RecursiveWalker {
             m: &mut self.model,
-            f: &mut NamedTensorVisitor::new(RESNET34_LAYERS.clone(), &tensors),
+            f: &mut NamedTensorVisitor::new(&RESNET34_LAYERS, &tensors),
         })?;
 
         Ok(())

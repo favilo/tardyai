@@ -5,13 +5,13 @@ use num_traits::NumCast;
 use crate::Error;
 
 pub(crate) struct NamedTensorVisitor<'a> {
-    names: Vec<&'static str>,
+    names: &'a [&'static str],
     idx: usize,
     tensors: &'a SafeTensors<'a>,
 }
 
 impl<'a> NamedTensorVisitor<'a> {
-    pub(crate) fn new(names: Vec<&'static str>, tensors: &'a SafeTensors<'a>) -> Self {
+    pub(crate) fn new(names: &'a [&'static str], tensors: &'a SafeTensors<'a>) -> Self {
         Self {
             names,
             idx: 0,
@@ -22,11 +22,8 @@ impl<'a> NamedTensorVisitor<'a> {
 
 impl<'a, E: Dtype + SafeDtype, D: Device<E>> TensorVisitor<E, D> for NamedTensorVisitor<'a> {
     type Viewer = ViewTensorMut;
-
     type Err = Error;
-
     type E2 = E;
-
     type D2 = D;
 
     fn visit<S: Shape>(
