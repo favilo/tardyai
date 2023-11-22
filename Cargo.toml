@@ -6,7 +6,7 @@ members = [
 ]
 
 [workspace.dependencies]
-dfdx = { version = "0.13", features = ["f16"] }
+dfdx = { version = "0.13", features = ["safetensors"] }
 log = { version = "0.4" }
 env_logger = { version = "0.10.1" }
 

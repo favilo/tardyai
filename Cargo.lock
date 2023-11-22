@@ -251,9 +251,6 @@ name = "cudarc"
 version = "0.9.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1871a911a2b9a3f66a285896a719159985683bf9903aa2cf89e0c9f53e14552"
-dependencies = [
- "half",
-]
 
 [[package]]
 name = "dashmap"
@@ -279,12 +276,13 @@ dependencies = [
  "cudarc",
  "gemm",
  "glob",
- "half",
  "libm",
+ "memmap2 0.5.10",
  "num-traits",
  "rand",
  "rand_distr",
  "rayon",
+ "safetensors",
 ]
 
 [[package]]
@@ -724,8 +722,6 @@ dependencies = [
  "cfg-if",
  "crunchy",
  "num-traits",
- "rand",
- "rand_distr",
 ]
 
 [[package]]
@@ -991,6 +987,24 @@ name = "memchr"
 version = "2.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f665ee40bc4a3c5590afb1e9677db74a508659dfd71e126420da8274909a0167"
+
+[[package]]
+name = "memmap2"
+version = "0.5.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "83faa42c0a078c393f6b29d5db232d8be22776a891f8f56e5284faee4a20b327"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "memmap2"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "deaba38d7abf1d4cca21cc89e932e542ba2b9258664d2a9ef0e61512039c9375"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "memoffset"
@@ -1483,6 +1497,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ad4cc8da4ef723ed60bced201181d83791ad433213d8c24efffda1eec85d741"
 
 [[package]]
+name = "safetensors"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d93279b86b3de76f820a8854dd06cbc33cfa57a417b19c47f6a25280112fb1df"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "same-file"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1702,7 +1726,9 @@ dependencies = [
  "homedir",
  "image",
  "log",
+ "memmap2 0.9.0",
  "reqwest",
+ "safetensors",
  "tar",
  "thiserror",
  "walkdir",

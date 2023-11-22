@@ -14,4 +14,22 @@ pub enum Error {
 
     #[error("image error: {0}")]
     Image(#[from] image::ImageError),
+
+    #[error("download name not specified: {0}")]
+    DownloadNameNotSpecified(String),
+
+    #[error("Error with safetensors file: {0:?}")]
+    Safetensors(dfdx::tensor::safetensors::Error),
+}
+
+impl From<dfdx::tensor::safetensors::Error> for Error {
+    fn from(value: dfdx::tensor::safetensors::Error) -> Self {
+        Self::Safetensors(value)
+    }
+}
+
+impl From<safetensors::SafeTensorError> for Error {
+    fn from(value: safetensors::SafeTensorError) -> Self {
+        Self::Safetensors(dfdx::tensor::safetensors::Error::SafeTensorError(value))
+    }
 }

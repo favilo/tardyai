@@ -1,8 +1,13 @@
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
+
 use std::path::{Path, PathBuf};
 
 use color_eyre::eyre::{Context, Result};
-use dfdx::tensor::AutoDevice;
-use tardyai::{datasets::DirectoryImageDataset, untar_images, Url};
+use dfdx::prelude::*;
+use tardyai::{
+    datasets::DirectoryImageDataset, models::resnet::Resnet34Model, untar_images, DatasetUrl,
+};
 
 fn main() -> Result<()> {
     env_logger::Builder::new()
@@ -10,7 +15,7 @@ fn main() -> Result<()> {
         .init();
     color_eyre::install()?;
 
-    let path: PathBuf = untar_images(Url::Pets)
+    let path: PathBuf = untar_images(DatasetUrl::Pets)
         .context("downloading Pets")?
         .join("images");
     log::info!("Images are in: {}", path.display());
@@ -28,6 +33,11 @@ fn main() -> Result<()> {
 
     let dataset = DirectoryImageDataset::new(path, dev.clone(), is_cat)?;
     log::info!("Found {} files", dataset.files().len());
+
+    log::info!("Building the ResNet-34 model");
+    let mut model = Resnet34Model::<1000, f32>::build(dev);
+    log::info!("Done building model");
+    model.download_model()?;
 
     Ok(())
 }

@@ -13,15 +13,36 @@ const S3_BASE: &str = "https://s3.amazonaws.com/fast-ai-";
 const S3_IMAGE: &str = "imageclas/";
 
 #[derive(Debug, Clone, Copy)]
-pub enum Url {
+pub enum DatasetUrl {
     Pets,
 }
 
-impl Url {
+impl DatasetUrl {
     pub fn url(self) -> String {
         match self {
             Self::Pets => {
                 format!("{S3_BASE}{S3_IMAGE}oxford-iiit-pet.tgz")
+            }
+        }
+    }
+}
+
+const HF_BASE: &'static str = "https://huggingface.co/";
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum ModelUrl {
+    Resnet18,
+    Resnet34,
+}
+
+impl ModelUrl {
+    pub(crate) fn url(self) -> String {
+        match self {
+            ModelUrl::Resnet18 => {
+                format!("{HF_BASE}microsoft/resnet-18/resolve/main/model.safetensors?download=true")
+            }
+            ModelUrl::Resnet34 => {
+                format!("{HF_BASE}microsoft/resnet-34/resolve/main/model.safetensors?download=true")
             }
         }
     }
@@ -34,13 +55,18 @@ fn ensure_dir(path: &PathBuf) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn untar_images(url: Url) -> Result<PathBuf, Error> {
-    let home = &homedir::get_my_home()?
+fn get_home_dir() -> Result<PathBuf, Error> {
+    let home = homedir::get_my_home()?
         .expect("home directory needs to exist")
         .join(".tardyai");
+    Ok(home)
+}
+
+pub fn untar_images(url: DatasetUrl) -> Result<PathBuf, Error> {
+    let home = get_home_dir()?;
     let dest_dir = home.join("archive");
     ensure_dir(&dest_dir)?;
-    let archive_file = download_archive(url, &dest_dir)?;
+    let archive_file = download_file(url.url(), &dest_dir, None)?;
 
     let dest_dir = home.join("data");
     let dir = extract_archive(&archive_file, &dest_dir)?;
@@ -48,31 +74,37 @@ pub fn untar_images(url: Url) -> Result<PathBuf, Error> {
     Ok(dir)
 }
 
-fn download_archive(url: Url, dest_dir: &Path) -> Result<PathBuf, Error> {
-    let mut response = reqwest::blocking::get(url.url())?;
-    let archive_name = response
-        .url()
-        .path_segments()
-        .and_then(|s| s.last())
-        .and_then(|name| if name.is_empty() { None } else { Some(name) })
-        .unwrap_or("tmp.tar.gz");
+pub(crate) fn download_model(url: ModelUrl) -> Result<PathBuf, Error> {
+    let home = get_home_dir()?;
+    let dest_dir = home.join("models");
+    ensure_dir(&dest_dir)?;
+    let model_file = download_file(url.url(), &dest_dir, Some(&format!("{url:?}.safetensors")))?;
+    Ok(model_file)
+}
 
-    let archive_file = dest_dir.join(archive_name);
+fn download_file(
+    url: String,
+    dest_dir: &Path,
+    default_name: Option<&str>,
+) -> Result<PathBuf, Error> {
+    let mut response = reqwest::blocking::get(&url)?;
+    let file_name = default_name
+        .or(response.url().path_segments().and_then(|s| s.last()))
+        .and_then(|name| if name.is_empty() { None } else { Some(name) })
+        .ok_or(Error::DownloadNameNotSpecified(url.clone()))?;
+
+    let downloaded_file = dest_dir.join(file_name);
 
     // TODO: check if the archive is valid and exists
-    if archive_file.exists() {
-        log::info!("Archive already exists: {}", archive_file.display());
-        return Ok(archive_file);
+    if downloaded_file.exists() {
+        log::info!("File already exists: {}", downloaded_file.display());
+        return Ok(downloaded_file);
     }
 
-    log::info!(
-        "Downloading {} to archive: {}",
-        url.url(),
-        archive_file.display()
-    );
-    let mut dest = File::create(&archive_file)?;
+    log::info!("Downloading {} to: {}", &url, downloaded_file.display());
+    let mut dest = File::create(&downloaded_file)?;
     response.copy_to(&mut dest)?;
-    Ok(archive_file)
+    Ok(downloaded_file)
 }
 
 fn extract_archive(archive_file: &Path, dest_dir: &Path) -> Result<PathBuf, Error> {
