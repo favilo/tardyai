@@ -18,8 +18,14 @@ pub enum Error {
     #[error("download name not specified: {0}")]
     DownloadNameNotSpecified(String),
 
-    #[error("Error with safetensors file: {0:?}")]
+    #[error("error with safetensors file: {0:?}")]
     Safetensors(dfdx::tensor::safetensors::Error),
+
+    #[error("not enough tensor names")]
+    NotEnoughNames,
+
+    #[error("error converting number formats")]
+    NumberFormatException,
 }
 
 impl From<dfdx::tensor::safetensors::Error> for Error {
