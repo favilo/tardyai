@@ -4,7 +4,7 @@
 use std::path::{Path, PathBuf};
 
 use color_eyre::eyre::{Context, Result};
-use dfdx::prelude::*;
+use dfdx::{data::ExactSizeDataset, prelude::*};
 use tardyai::{
     datasets::DirectoryImageDataset, models::resnet::Resnet34Model, untar_images, DatasetUrl,
 };
@@ -38,6 +38,22 @@ fn main() -> Result<()> {
     let mut model = Resnet34Model::<1000, f32>::build(dev);
     log::info!("Done building model");
     model.download_model()?;
+
+    let (image, is_cat) = dataset.get(1)?;
+    let categories = model.model.forward(image);
+
+    log::info!("Is Cat? {}", is_cat);
+    log::trace!("Categories: {:#?}", categories.array());
+
+    let max_category = categories
+        .softmax()
+        .array()
+        .into_iter()
+        .map(ordered_float::OrderedFloat)
+        .enumerate()
+        .max_by_key(|t| t.1)
+        .unwrap();
+    log::info!("(Category, Weight): {:?}", max_category);
 
     Ok(())
 }

@@ -11,3 +11,4 @@ tardyai = { path = "../tardyai" }
 env_logger = { workspace = true }
 log = { workspace = true }
 dfdx = { workspace = true }
+ordered-float = "4.1.1"

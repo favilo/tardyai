@@ -132,7 +132,7 @@ where
     Resnet34<NUM_CLASSES>: BuildOnDevice<AutoDevice, E>,
     AutoDevice: Device<E>,
 {
-    model: <Resnet34<NUM_CLASSES> as BuildOnDevice<AutoDevice, E>>::Built,
+    pub model: <Resnet34<NUM_CLASSES> as BuildOnDevice<AutoDevice, E>>::Built,
 }
 
 impl<E, const N: usize> Resnet34Model<N, E>
@@ -150,7 +150,7 @@ where
         log::info!("Downloading model from {}", ModelUrl::Resnet34.url());
         let model_file = download_model(ModelUrl::Resnet34)?;
 
-        // TODO: Some how make something like this work
+        // TODO: Somehow make something like this work
         // self.model.load_safetensors(&model_file)?;
 
         let file = File::open(model_file).unwrap();
