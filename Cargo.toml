@@ -6,7 +6,20 @@ members = [
 ]
 
 [workspace.dependencies]
-dfdx = { version = "0.13", features = ["safetensors"] }
+# dfdx = { version = "0.13", features = ["safetensors"] }
 log = { version = "0.4" }
 env_logger = { version = "0.10.1" }
 
+[workspace.dependencies.dfdx]
+git = "https://github.com/coreylowman/dfdx"
+rev = "4476b5ee19dc9cc446388545560c57e80cb086c8"
+features = ["safetensors"]
+
+[workspace.dependencies.dfdx-core]
+git = "https://github.com/coreylowman/dfdx"
+rev = "4476b5ee19dc9cc446388545560c57e80cb086c8"
+features = ["safetensors"]
+
+[workspace.dependencies.dfdx-derives]
+git = "https://github.com/coreylowman/dfdx"
+rev = "4476b5ee19dc9cc446388545560c57e80cb086c8"

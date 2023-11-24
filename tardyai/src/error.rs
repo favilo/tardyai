@@ -18,8 +18,14 @@ pub enum Error {
     #[error("download name not specified: {0}")]
     DownloadNameNotSpecified(String),
 
-    #[error("error with safetensors file: {0:?}")]
-    Safetensors(dfdx::tensor::safetensors::Error),
+    #[error("error with dfdx: {0}")]
+    Dfdx(dfdx::prelude::Error),
+
+    #[error("error with dfdx tensors: {0:?}")]
+    DfdxTensor(dfdx_core::tensor::Error),
+
+    #[error("error with safetensors: {0}")]
+    Safetensors(#[from] safetensors::SafeTensorError),
 
     #[error("error with optimizer update: {0}")]
     OptimizerUpdate(#[from] dfdx::optim::OptimizerUpdateError<dfdx::tensor::CpuError>),
@@ -37,14 +43,8 @@ pub enum Error {
     NoValidationDataset,
 }
 
-impl From<dfdx::tensor::safetensors::Error> for Error {
-    fn from(value: dfdx::tensor::safetensors::Error) -> Self {
-        Self::Safetensors(value)
-    }
-}
-
-impl From<safetensors::SafeTensorError> for Error {
-    fn from(value: safetensors::SafeTensorError) -> Self {
-        Self::Safetensors(dfdx::tensor::safetensors::Error::SafeTensorError(value))
-    }
-}
+// impl From<safetensors::SafeTensorError> for Error {
+//     fn from(value: safetensors::SafeTensorError) -> Self {
+//         Self::Safetensors(dfdx::tensor::safetensors::Error::SafeTensorError(value))
+//     }
+// }
