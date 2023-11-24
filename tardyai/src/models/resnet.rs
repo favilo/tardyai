@@ -125,6 +125,8 @@ pub type Resnet34Body = (
 );
 
 pub type Resnet34<const NUM_CLASSES: usize> = (Resnet34Body, Head<NUM_CLASSES>);
+type Resnet34Built<const NUM_CLASSES: usize, E> =
+    <Resnet34<NUM_CLASSES> as BuildOnDevice<AutoDevice, E>>::Built;
 
 pub struct Resnet34Model<const NUM_CLASSES: usize, E>
 where
@@ -132,7 +134,7 @@ where
     Resnet34<NUM_CLASSES>: BuildOnDevice<AutoDevice, E>,
     AutoDevice: Device<E>,
 {
-    pub model: <Resnet34<NUM_CLASSES> as BuildOnDevice<AutoDevice, E>>::Built,
+    pub model: Resnet34Built<NUM_CLASSES, E>,
 }
 
 impl<E, const N: usize> Resnet34Model<N, E>
@@ -157,13 +159,12 @@ where
         let buffer = unsafe { MmapOptions::new().map(&file).unwrap() };
         let tensors = SafeTensors::deserialize(&buffer).unwrap();
 
-        let _ = <<Resnet34<N> as BuildOnDevice<AutoDevice, E>>::Built as TensorCollection<
-            E,
-            AutoDevice,
-        >>::iter_tensors(&mut RecursiveWalker {
-            m: &mut self.model,
-            f: &mut NamedTensorVisitor::new(&RESNET34_LAYERS, &tensors),
-        })?;
+        let _ = <Resnet34Built<N, E> as TensorCollection<E, AutoDevice>>::iter_tensors(
+            &mut RecursiveWalker {
+                m: &mut self.model,
+                f: &mut NamedTensorVisitor::new(&RESNET34_LAYERS, &tensors),
+            },
+        )?;
 
         Ok(())
     }
