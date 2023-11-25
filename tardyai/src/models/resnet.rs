@@ -125,7 +125,7 @@ pub type Resnet34Body = (
 );
 
 pub type Resnet34<const NUM_CLASSES: usize> = (Resnet34Body, Head<NUM_CLASSES>);
-type Resnet34Built<const NUM_CLASSES: usize, E> =
+pub(crate) type Resnet34Built<const NUM_CLASSES: usize, E> =
     <Resnet34<NUM_CLASSES> as BuildOnDevice<AutoDevice, E>>::Built;
 
 pub struct Resnet34Model<const NUM_CLASSES: usize, E>
