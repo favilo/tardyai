@@ -11,6 +11,7 @@ use dfdx::{
     tensor::{AutoDevice, TensorFrom, Trace},
     tensor_ops::{AdamConfig, Backward},
 };
+use indicatif::ProgressIterator;
 
 use crate::{
     datasets::DirectoryImageDataset,
@@ -67,6 +68,7 @@ impl<'a> VisualLearner<'a> {
                 .batch_exact(Const::<16>)
                 .collate()
                 .stack()
+                .progress()
             {
                 let logits = self.model.model.forward_mut(image.traced(grads));
                 let loss = cross_entropy_with_logits_loss(logits, is_cat);

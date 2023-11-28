@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use color_eyre::eyre::{Context, Result};
 use dfdx::{data::ExactSizeDataset, prelude::*};
 use tardyai::{
-    datasets::DirectoryImageDataset, models::resnet::Resnet34Model, untar_images, DatasetUrl,
+    datasets::DirectoryImageDataset, models::resnet::Resnet34Model, untar_images, DatasetUrl, learners::visual::VisualLearner,
 };
 
 fn main() -> Result<()> {
@@ -38,7 +38,7 @@ fn main() -> Result<()> {
     let model = Resnet34Model::<2, f32>::build(dev.clone());
     log::info!("Done building model");
 
-    let mut learner = tardyai::learners::visual::VisualLearner::builder(dev.clone())
+    let mut learner = VisualLearner::builder(dev.clone())
         .dataset(dataset)
         .model(model)
         .build();
