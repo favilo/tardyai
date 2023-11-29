@@ -6,8 +6,8 @@ use memmap2::MmapOptions;
 
 use crate::{
     download::{download_model, ModelUrl},
+    error::Error,
     models::loader::NamedTensorVisitor,
-    Error,
 };
 
 mod layers;

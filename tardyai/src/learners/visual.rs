@@ -1,34 +1,34 @@
 use std::marker::PhantomData;
 
 use dfdx::{
-    data::{
-        ExactSizeDataset, IteratorBatchExt, IteratorCollateExt, IteratorStackExt, OneHotEncode,
-    },
+    data::{ExactSizeDataset, IteratorBatchExt, IteratorCollateExt, IteratorStackExt},
     losses::cross_entropy_with_logits_loss,
     nn::{ModuleMut, ZeroGrads},
     optim::{Adam, Optimizer},
     shapes::Const,
-    tensor::{AutoDevice, TensorFrom, Trace},
+    tensor::{AutoDevice, Trace},
     tensor_ops::{AdamConfig, Backward},
 };
 use indicatif::ProgressIterator;
 
 use crate::{
-    datasets::DirectoryImageDataset,
+    category::{datasets::DirectoryImageDataset, encoders::IntoOneHot},
     error::Error,
     models::resnet::{Resnet34Built, Resnet34Model},
 };
 
 // Hard code sizes and types of datasets for now. We will generalize later.
-pub struct VisualLearner<'a> {
+pub struct VisualLearner<'a, const N: usize, Category> {
     device: AutoDevice,
-    dataset: DirectoryImageDataset<'a>,
-    model: Resnet34Model<2, f32>,
-    optimizer: Adam<Resnet34Built<2, f32>, f32, AutoDevice>,
+    dataset: &'a DirectoryImageDataset<'a, N, Category>,
+    model: Resnet34Model<N, f32>,
+    optimizer: Adam<Resnet34Built<N, f32>, f32, AutoDevice>,
 }
 
-impl<'a> VisualLearner<'a> {
-    pub fn builder(device: AutoDevice) -> builder::Builder<'a, builder::WithoutDataset> {
+impl<'a, const N: usize, Category: IntoOneHot<N>> VisualLearner<'a, N, Category> {
+    pub fn builder(
+        device: AutoDevice,
+    ) -> builder::Builder<'a, builder::WithoutDataset, N, Category> {
         builder::Builder {
             device,
             dataset: None,
@@ -39,8 +39,8 @@ impl<'a> VisualLearner<'a> {
 
     fn new(
         device: AutoDevice,
-        dataset: DirectoryImageDataset<'a>,
-        model: Resnet34Model<2, f32>,
+        dataset: &'a DirectoryImageDataset<'a, N, Category>,
+        model: Resnet34Model<N, f32>,
     ) -> Self {
         let adam = Adam::new(&model.model, AdamConfig::default());
         Self {
@@ -60,11 +60,7 @@ impl<'a> VisualLearner<'a> {
                 .dataset
                 .shuffled(&mut rng)
                 .map(Result::unwrap)
-                .map(|(image, is_cat)| {
-                    let mut one_hotted = [0.0; 2];
-                    one_hotted[is_cat as usize] = 1.0;
-                    (image, self.device.tensor(one_hotted))
-                })
+                .map(|(image, is_cat)| (image, is_cat.into_one_hot(&self.device)))
                 .batch_exact(Const::<16>)
                 .collate()
                 .stack()
@@ -83,21 +79,24 @@ impl<'a> VisualLearner<'a> {
 
 pub mod builder {
     use super::*;
-    use crate::{datasets::DirectoryImageDataset, models::resnet::Resnet34Model};
+    use crate::{category::datasets::DirectoryImageDataset, models::resnet::Resnet34Model};
 
     pub struct WithoutDataset;
     pub struct WithoutModel;
     pub struct Ready;
 
-    pub struct Builder<'a, T> {
+    pub struct Builder<'a, T, const N: usize, Category> {
         pub(super) device: AutoDevice,
-        pub(super) dataset: Option<DirectoryImageDataset<'a>>,
-        pub(super) model: Option<Resnet34Model<2, f32>>,
+        pub(super) dataset: Option<&'a DirectoryImageDataset<'a, N, Category>>,
+        pub(super) model: Option<Resnet34Model<N, f32>>,
         pub(super) _phantom: PhantomData<T>,
     }
 
-    impl<'a> Builder<'a, WithoutDataset> {
-        pub fn dataset(self, dataset: DirectoryImageDataset<'a>) -> Builder<'a, WithoutModel> {
+    impl<'a, const N: usize, Category> Builder<'a, WithoutDataset, N, Category> {
+        pub fn dataset(
+            self,
+            dataset: &'a DirectoryImageDataset<'a, N, Category>,
+        ) -> Builder<'a, WithoutModel, N, Category> {
             Builder {
                 device: self.device,
                 dataset: Some(dataset),
@@ -107,8 +106,8 @@ pub mod builder {
         }
     }
 
-    impl<'a> Builder<'a, WithoutModel> {
-        pub fn model(self, model: Resnet34Model<2, f32>) -> Builder<'a, Ready> {
+    impl<'a, const N: usize, Category> Builder<'a, WithoutModel, N, Category> {
+        pub fn model(self, model: Resnet34Model<N, f32>) -> Builder<'a, Ready, N, Category> {
             Builder {
                 device: self.device,
                 dataset: self.dataset,
@@ -118,8 +117,8 @@ pub mod builder {
         }
     }
 
-    impl<'a> Builder<'a, Ready> {
-        pub fn build(self) -> VisualLearner<'a> {
+    impl<'a, const N: usize, Category: IntoOneHot<N>> Builder<'a, Ready, N, Category> {
+        pub fn build(self) -> VisualLearner<'a, N, Category> {
             let model = self.model.unwrap();
             VisualLearner::new(self.device, self.dataset.unwrap(), model)
         }
