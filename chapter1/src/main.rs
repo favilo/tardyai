@@ -4,10 +4,8 @@
 use std::path::{Path, PathBuf};
 
 use color_eyre::eyre::{Context, Result};
-use dfdx::{data::ExactSizeDataset, prelude::*};
-use tardyai::{
-    datasets::DirectoryImageDataset, models::resnet::Resnet34Model, untar_images, DatasetUrl, learners::visual::VisualLearner,
-};
+use dfdx::prelude::*;
+use tardyai::prelude::*;
 
 fn main() -> Result<()> {
     env_logger::Builder::new()
@@ -31,7 +29,10 @@ fn main() -> Result<()> {
             .unwrap_or(false)
     };
 
-    let dataset = DirectoryImageDataset::new(path, dev.clone(), is_cat)?;
+    let dataset_loader = DirectoryImageDataLoader::builder(path, dev.clone())
+        .with_label_fn(&is_cat)
+        .build()?;
+    let dataset = dataset_loader.training();
     log::info!("Found {} files", dataset.files().len());
 
     log::info!("Building the ResNet-34 model");

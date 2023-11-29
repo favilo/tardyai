@@ -104,7 +104,7 @@ fn download_file(
     log::info!("Downloading {} to: {}", &url, downloaded_file.display());
     let mut dest = File::create(&downloaded_file)?;
     let pb = indicatif::ProgressBar::new(response.content_length().unwrap_or(0));
-    let mut buf = [0; 8192]; // 8KiB buffer
+    let mut buf = [0; 262144]; // 256KiB buffer
     while response.read(&mut buf)? > 0 {
         dest.write_all(&buf)?;
         pb.inc(buf.len() as u64);
