@@ -29,7 +29,7 @@ fn main() -> Result<()> {
             .unwrap_or(false)
     };
 
-    let dataset_loader = DirectoryDataLoader::builder(path, dev.clone())
+    let dataset_loader = DirectoryImageDataLoader::builder(path, dev.clone())
         .with_label_fn(&is_cat)
         .build()?;
     let dataset = dataset_loader.training();

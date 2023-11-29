@@ -86,18 +86,18 @@ impl<const N: usize, Category> ExactSizeDataset for DirectoryImageDataset<'_, N,
     }
 }
 
-pub struct DirectoryDataLoader<'fun, const N: usize, Category> {
+pub struct DirectoryImageDataLoader<'fun, const N: usize, Category> {
     training: DirectoryImageDataset<'fun, N, Category>,
     validation: DirectoryImageDataset<'fun, N, Category>,
     test: DirectoryImageDataset<'fun, N, Category>,
 }
 
-impl<'fun, const N: usize, Category: IntoOneHot<N>> DirectoryDataLoader<'fun, N, Category> {
+impl<'fun, const N: usize, Category: IntoOneHot<N>> DirectoryImageDataLoader<'fun, N, Category> {
     pub fn builder(
         parent: impl AsRef<Path>,
         dev: AutoDevice,
-    ) -> data_loader::Builder<'fun, N, Category> {
-        data_loader::Builder::new(parent.as_ref().to_owned(), dev)
+    ) -> image_data_loader::Builder<'fun, N, Category> {
+        image_data_loader::Builder::new(parent.as_ref().to_owned(), dev)
     }
 
     pub fn training(&self) -> &DirectoryImageDataset<'fun, N, Category> {
@@ -113,7 +113,7 @@ impl<'fun, const N: usize, Category: IntoOneHot<N>> DirectoryDataLoader<'fun, N,
     }
 }
 
-mod data_loader {
+pub mod image_data_loader {
     use std::path::PathBuf;
 
     use dfdx::tensor::AutoDevice;
@@ -149,7 +149,7 @@ mod data_loader {
             self
         }
 
-        pub fn build(self) -> Result<DirectoryDataLoader<'fun, N, Category>, Error> {
+        pub fn build(self) -> Result<DirectoryImageDataLoader<'fun, N, Category>, Error> {
             let exts = image_extensions();
 
             let mut splitter = self
@@ -174,7 +174,7 @@ mod data_loader {
             let validation = DirectoryImageDataset::new(&validation, self.dev.clone(), label_fn)?;
             let test = DirectoryImageDataset::new(&test, self.dev, label_fn)?;
 
-            Ok(DirectoryDataLoader {
+            Ok(DirectoryImageDataLoader {
                 training,
                 validation,
                 test,

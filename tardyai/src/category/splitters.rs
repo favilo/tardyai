@@ -38,7 +38,7 @@ impl Default for RatioSplitter {
     }
 }
 
-impl<T: Ord + Clone> Splitter<T> for RatioSplitter {
+impl<T: Ord> Splitter<T> for RatioSplitter {
     fn split(&mut self, mut files: Vec<T>) -> (Vec<T>, Vec<T>, Vec<T>) {
         files.sort();
         files.shuffle(&mut self.rng);
