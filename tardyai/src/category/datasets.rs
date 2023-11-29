@@ -66,7 +66,8 @@ impl<const N: usize, Category> ExactSizeDataset for DirectoryImageDataset<'_, N,
         }
         // Read the image and resize it to 224x224, and 3 channels
         let image = ImageReader::open(image_file)?
-            .decode()?
+            .decode()
+            .map_err(|e| Error::DecodeImageError(image_file.clone(), e))?
             .resize_exact(224, 224, FilterType::Triangle)
             .into_rgb8();
 
