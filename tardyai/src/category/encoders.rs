@@ -2,7 +2,7 @@ use std::path::Path;
 
 use dfdx::prelude::*;
 
-pub type LabelFn<const N: usize, Category> = dyn Fn(&Path) -> Category;
+pub type LabelFn<Category> = dyn Fn(&Path) -> Category;
 
 pub trait IntoOneHot<const N: usize>: Default {
     fn into_one_hot(&self, dev: &AutoDevice) -> Tensor<Rank1<N>, f32, AutoDevice>;

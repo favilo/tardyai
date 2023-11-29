@@ -30,7 +30,7 @@ fn image_extensions() -> HashSet<&'static str> {
 pub struct DirectoryImageDataset<'fun, const N: usize, Category> {
     files: Vec<PathBuf>,
     dev: AutoDevice,
-    label_fn: &'fun LabelFn<N, Category>,
+    label_fn: &'fun LabelFn<Category>,
     tensors: DashMap<PathBuf, Tensor<Rank3<3, 224, 224>, f32, AutoDevice>>,
 }
 
@@ -38,7 +38,7 @@ impl<'fun, const N: usize, Category> DirectoryImageDataset<'fun, N, Category> {
     fn new(
         files: &[PathBuf],
         dev: AutoDevice,
-        label_fn: &'fun LabelFn<N, Category>,
+        label_fn: &'fun LabelFn<Category>,
     ) -> Result<Self, Error> {
         Ok(Self {
             files: files.to_owned(),
@@ -126,7 +126,7 @@ mod data_loader {
         parent: PathBuf,
         dev: AutoDevice,
         splitter: Option<Box<dyn Splitter<PathBuf>>>,
-        label_fn: Option<&'fun LabelFn<N, Category>>,
+        label_fn: Option<&'fun LabelFn<Category>>,
     }
 
     impl<'fun, const N: usize, Category: IntoOneHot<N>> Builder<'fun, N, Category> {
@@ -144,7 +144,7 @@ mod data_loader {
             self
         }
 
-        pub fn with_label_fn(mut self, label_fn: &'fun LabelFn<N, Category>) -> Self {
+        pub fn with_label_fn(mut self, label_fn: &'fun LabelFn<Category>) -> Self {
             self.label_fn = Some(label_fn);
             self
         }
