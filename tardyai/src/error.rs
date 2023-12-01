@@ -32,6 +32,9 @@ pub enum Error {
 
     #[error("error while decoding image '{0}': {1}")]
     DecodeImageError(std::path::PathBuf, image::ImageError),
+
+    #[error("no validation dataset defined")]
+    NoValidationDataset,
 }
 
 impl From<dfdx::tensor::safetensors::Error> for Error {

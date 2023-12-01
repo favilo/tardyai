@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::{fs::File, path::Path};
 
 use ::safetensors::SafeTensors;
 use dfdx::{prelude::*, tensor::safetensors::SafeDtype};
@@ -166,6 +166,11 @@ where
             },
         )?;
 
+        Ok(())
+    }
+
+    pub fn load_model(&mut self, path: impl AsRef<Path>) -> Result<(), Error> {
+        self.model.load_safetensors(path)?;
         Ok(())
     }
 }
