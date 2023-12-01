@@ -27,9 +27,8 @@ pub enum Error {
     #[error("error with safetensors: {0}")]
     Safetensors(#[from] safetensors::SafeTensorError),
 
-    #[error("error with optimizer update: {0}")]
-    OptimizerUpdate(#[from] dfdx::optim::OptimizerUpdateError<dfdx::tensor::CpuError>),
-
+    // #[error("error with optimizer update: {0}")]
+    // OptimizerUpdate(#[from] dfdx::optim::OptimizerUpdateError<dfdx::tensor::CpuError>),
     #[error("not enough tensor names")]
     NotEnoughNames,
 

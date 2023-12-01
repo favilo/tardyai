@@ -2,7 +2,7 @@
 // use dfdx::{prelude::*, tensor::safetensors::SafeDtype};
 // use num_traits::NumCast;
 
-use crate::error::Error;
+// use crate::error::Error;
 
 // pub(crate) struct NamedTensorVisitor<'a> {
 //     names: &'a [&'static str],
