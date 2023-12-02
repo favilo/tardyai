@@ -27,6 +27,7 @@ rand = "0.8.5"
 indicatif = { version = "0.17.7", features = ["rayon"] }
 
 [features]
-default = []
+default = ["safetensors"]
 
 cuda = [ "dfdx/cuda", "dfdx/cudnn" ]
+safetensors = [ "dfdx/safetensors", "dfdx-core/safetensors", "dfdx-derives/safetensors" ]

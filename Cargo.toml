@@ -21,6 +21,10 @@ rev = "4476b5ee19dc9cc446388545560c57e80cb086c8"
 features = ["safetensors"]
 
 [workspace.dependencies.dfdx-derives]
-git = "https://github.com/coreylowman/dfdx"
-rev = "4476b5ee19dc9cc446388545560c57e80cb086c8"
+# git = "https://github.com/coreylowman/dfdx"
+# rev = "4476b5ee19dc9cc446388545560c57e80cb086c8"
+path = "../../../utilities/dfdx/dfdx-derives/"
 features = ["safetensors"]
+
+[patch."https://github.com/coreylowman/dfdx"]
+dfdx-derives = { path = "../../../utilities/dfdx/dfdx-derives/" }

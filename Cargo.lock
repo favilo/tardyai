@@ -401,11 +401,24 @@ name = "dfdx"
 version = "0.13.0"
 source = "git+https://github.com/coreylowman/dfdx?rev=4476b5ee19dc9cc446388545560c57e80cb086c8#4476b5ee19dc9cc446388545560c57e80cb086c8"
 dependencies = [
- "dfdx-core",
+ "dfdx-core 0.13.0 (git+https://github.com/coreylowman/dfdx?rev=4476b5ee19dc9cc446388545560c57e80cb086c8)",
  "dfdx-derives",
  "num-traits",
  "rand_distr",
  "safetensors",
+]
+
+[[package]]
+name = "dfdx-core"
+version = "0.13.0"
+dependencies = [
+ "cudarc",
+ "gemm",
+ "libm",
+ "num-traits",
+ "rand",
+ "rand_distr",
+ "rayon",
 ]
 
 [[package]]
@@ -428,9 +441,8 @@ dependencies = [
 [[package]]
 name = "dfdx-derives"
 version = "0.13.0"
-source = "git+https://github.com/coreylowman/dfdx?rev=4476b5ee19dc9cc446388545560c57e80cb086c8#4476b5ee19dc9cc446388545560c57e80cb086c8"
 dependencies = [
- "dfdx-core",
+ "dfdx-core 0.13.0",
  "proc-macro2",
  "quote",
  "syn 2.0.39",
@@ -1999,7 +2011,7 @@ version = "0.1.0"
 dependencies = [
  "dashmap",
  "dfdx",
- "dfdx-core",
+ "dfdx-core 0.13.0 (git+https://github.com/coreylowman/dfdx?rev=4476b5ee19dc9cc446388545560c57e80cb086c8)",
  "dfdx-derives",
  "env_logger",
  "flate2",

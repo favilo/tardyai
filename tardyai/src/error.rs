@@ -25,7 +25,7 @@ pub enum Error {
     DfdxTensor(dfdx_core::tensor::Error),
 
     #[error("error with safetensors: {0}")]
-    Safetensors(#[from] safetensors::SafeTensorError),
+    Safetensors(#[from] ::safetensors::SafeTensorError),
 
     // #[error("error with optimizer update: {0}")]
     // OptimizerUpdate(#[from] dfdx::optim::OptimizerUpdateError<dfdx::tensor::CpuError>),

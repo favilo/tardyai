@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use clap::Parser;
 use color_eyre::eyre::{Context, Result};
 use dfdx::prelude::*;
-use tardyai::{category::splitters::RatioSplitter, prelude::*};
+use tardyai::{category::splitters::RatioSplitter, models::resnet::Resnet18Config, prelude::*};
 
 #[derive(Debug, Parser)]
 #[command(author = "Favil Orbedios")]
@@ -60,7 +60,9 @@ fn main() -> Result<()> {
     log::info!("Found {} files", dataset.files().len());
 
     log::info!("Building the ResNet-34 model");
-    let mut model = Resnet34Model::<2, f32>::build(dev.clone());
+    // let mut model = Resnet34Model::<2, f32>::build(dev.clone());
+    let config = Resnet18Config::<2>::default();
+    let mut model = dev.build_module::<f32>(config);
     log::info!("Done building model");
 
     if let Some(model_file) = args.model_file {
@@ -69,22 +71,24 @@ fn main() -> Result<()> {
         log::info!("Done loading old model");
     }
 
-    let mut learner = VisualLearner::builder(dev.clone())
-        .save_each_block()
-        .start_epoch(args.start_epoch)
-        .with_valid_dataset(dataset_loader.validation())
-        .with_train_dataset(dataset)
-        .with_model(model)
-        .build();
+    model.download_model()?;
 
-    let valid_loss = learner.valid_loss()?;
-    log::info!("Valid loss: {:.5}", valid_loss);
+    // let mut learner = VisualLearner::builder(dev.clone())
+    //     .save_each_block()
+    //     .start_epoch(args.start_epoch)
+    //     .with_valid_dataset(dataset_loader.validation())
+    //     .with_train_dataset(dataset)
+    //     .with_model(model)
+    //     .build();
 
-    log::info!("Training");
-    learner.train(args.epochs)?;
-    log::info!("Done training");
+    // let valid_loss = learner.valid_loss()?;
+    // log::info!("Valid loss: {:.5}", valid_loss);
 
-    learner.save("model.safetensors")?;
+    // log::info!("Training");
+    // learner.train(args.epochs)?;
+    // log::info!("Done training");
+
+    // learner.save("model.safetensors")?;
 
     // model.download_model()?;
 

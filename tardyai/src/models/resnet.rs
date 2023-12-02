@@ -107,13 +107,18 @@ impl<E, const N: usize, D: Device<E>> Resnet18<N, E, D>
 where
     E: Dtype + num_traits::float::Float + SampleUniform,
     AutoDevice: Device<E>,
-    Resnet18<N, E, AutoDevice>: BuildOnDevice<E, AutoDevice>,
-    Resnet18Body<E, AutoDevice>: LoadSafeTensors,
+    // Resnet18<N, E, AutoDevice>: BuildOnDevice<E, AutoDevice>,
+    // Resnet18Body<E, AutoDevice>: LoadSafeTensors + BuildOnDevice<E, AutoDevice>,
 {
     pub fn download_model(&mut self) -> Result<(), crate::error::Error> {
         let model_file = download_model(ModelUrl::Resnet18)?;
         // TODO: This isn't implemented in dfdx-derives yet.
-        // self.body.load_safetensors(&model_file)?;
+        self.body.load_safetensors(&model_file)?;
+        Ok(())
+    }
+
+    pub fn load_model(&mut self, path: impl AsRef<Path>) -> Result<(), crate::error::Error> {
+        self.body.load_safetensors(path)?;
         Ok(())
     }
 }
